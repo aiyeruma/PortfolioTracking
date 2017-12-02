@@ -31,12 +31,12 @@ google <- function(sym, current = TRUE, sy = 2005, sm = 1, sd = 1, ey, em, ed)
     return(google_out)
 }
 
-# Test it
-google_data = google('GOOGL')
-
 # Load list of symbols
-SYM <- as.character( read.csv('D:/MS-BAIM/Web Data/SnPSymbols.csv', 
+SYM <- as.character( read.csv('SnPSymbols.csv', 
                               stringsAsFactors = FALSE, header = FALSE)[,1] )
+#need to make sure the Symbols file and the R file are in the same directory
+#user setwd command if required to achieve this
+
 # Hold stock data and vector of invalid requests
 DATA <- list()
 INVALID <- c()
@@ -46,8 +46,8 @@ for(sym in SYM){
     google_out <- google(sym)
     Sys.sleep(3)
     if(!is.null(google_out)) {
-        DATA[[sym]] <- google_out
-        DATA[[sym]]$Company <- sym
+        DATA[[sym]] <- google_out #get the stock prices
+        DATA[[sym]]$Company <- sym #and tag them with the stock ticker
     } else {
         INVALID <- c(INVALID, sym)
     }
@@ -59,21 +59,11 @@ SYM <- names(DATA)
 # Remove iteration variables
 rm(google_out, sym)
 
+#these are print commands that be ignored if not required
 cat("Successfully download", length(DATA), "symbols.")
 cat(length(INVALID), "invalid symbols requested.\n", paste(INVALID, collapse = "\n\t"))
 cat("We now have a list of data frames of each symbol.")
 cat("e.g. access MMM price history with DATA[['MMM']]")
 
-#for (i in (1:length(SYM))){
-#    DATA[[SYM[i]]]$Company <- SYM[i]
-#}
-
+#create a long csv file with all the stock data
 lapply(DATA, function(x) write.table(data.frame(x), 'mytestlist.csv'  , append= T, sep=',' ))
-
-
-#SYM = SYM[1:10]
-
-#SYM <- as.character( read.csv('D:/MS-BAIM/Web Data/http://trading.chrisconlan.com/SPstocks_current.csv', 
-#                              stringsAsFactors = FALSE, header = FALSE)[,1] )
-
-
